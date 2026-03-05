@@ -1,0 +1,27 @@
+{
+  "name": "llm-arena",
+  "version": "0.1.0",
+  "description": "LLM Arena — Model comparison harness for testing iteration strategies",
+  "type": "module",
+  "bin": {
+    "arena": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "chalk": "^5.4.1",
+    "cli-table3": "^0.6.5",
+    "commander": "^13.1.0",
+    "minimatch": "^10.2.4",
+    "nanoid": "^5.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.13",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
