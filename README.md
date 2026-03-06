@@ -1,30 +1,10 @@
-```
-    ╔═══════════════════════════════════════════════════════════════╗
-    ║                                                               ║
-    ║     ██╗     ██╗     ███╗   ███╗                               ║
-    ║     ██║     ██║     ████╗ ████║                               ║
-    ║     ██║     ██║     ██╔████╔██║                               ║
-    ║     ██║     ██║     ██║╚██╔╝██║                               ║
-    ║     ███████╗███████╗██║ ╚═╝ ██║                               ║
-    ║     ╚══════╝╚══════╝╚═╝     ╚═╝                               ║
-    ║                                                               ║
-    ║      █████╗ ██████╗ ███████╗███╗   ██╗ █████╗                 ║
-    ║     ██╔══██╗██╔══██╗██╔════╝████╗  ██║██╔══██╗                ║
-    ║     ███████║██████╔╝█████╗  ██╔██╗ ██║███████║                ║
-    ║     ██╔══██║██╔══██╗██╔══╝  ██║╚██╗██║██╔══██║                ║
-    ║     ██║  ██║██║  ██║███████╗██║ ╚████║██║  ██║                ║
-    ║     ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝                ║
-    ║                                                               ║
-    ║          ⚔️  M O D E L   V S   M O D E L  ⚔️                 ║
-    ║                                                               ║
-    ╚═══════════════════════════════════════════════════════════════╝
-```
+# LLM Arena
+
+![LLM Arena Screenshot](arena-screenshot.png)
 
 **Can a cheap model match a frontier model by iterating more?**
 
 LLM Arena pits AI models against each other on coding tasks — Street Fighter style. Each model gets agentic tools (file I/O, shell) and works in an isolated workspace. After both fighters finish, Opus judges the code quality and declares a winner.
-
-![LLM Arena Screenshot](arena-screenshot.png)
 
 ## Setup
 
