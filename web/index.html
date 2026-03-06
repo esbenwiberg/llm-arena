@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM ARENA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scanlines"></div>
+  <div class="crt-flicker"></div>
+
+  <div id="app">
+
+    <!-- ===== SCREEN 1: SELECT YOUR FIGHTERS ===== -->
+    <section id="screen-select" class="screen active">
+      <header class="title-bar">
+        <h1 class="title glow-yellow">LLM ARENA</h1>
+        <p class="subtitle blink-slow">SELECT YOUR FIGHTERS</p>
+      </header>
+
+      <div class="select-layout">
+        <div class="player-panel p1-panel">
+          <div class="player-label glow-blue">1P</div>
+          <div class="portrait-frame p1-frame" id="p1-portrait">
+            <div class="portrait-placeholder">?</div>
+          </div>
+          <div class="fighter-name" id="p1-name">- - -</div>
+          <div class="fighter-title" id="p1-title">&nbsp;</div>
+          <label class="sf-label">STRATEGY</label>
+          <select id="p1-strategy" class="sf-select">
+            <option value="single-pass">SINGLE PASS</option>
+            <option value="retry" selected>RETRY</option>
+            <option value="best-of-n">BEST OF N</option>
+            <option value="self-critique">SELF-CRITIQUE</option>
+            <option value="adversarial">ADVERSARIAL</option>
+          </select>
+        </div>
+
+        <div class="center-column">
+          <div class="vs-badge">VS</div>
+          <div class="roster" id="roster"></div>
+          <div id="custom-model-form" class="custom-model-form hidden">
+            <input type="text" id="custom-model-input" class="sf-input" placeholder="ollama model name">
+            <button id="custom-model-add" class="btn-small">ADD</button>
+            <button id="custom-model-cancel" class="btn-small btn-cancel">X</button>
+          </div>
+        </div>
+
+        <div class="player-panel p2-panel">
+          <div class="player-label glow-red">2P</div>
+          <div class="portrait-frame p2-frame" id="p2-portrait">
+            <div class="portrait-placeholder">?</div>
+          </div>
+          <div class="fighter-name" id="p2-name">- - -</div>
+          <div class="fighter-title" id="p2-title">&nbsp;</div>
+          <label class="sf-label">STRATEGY</label>
+          <select id="p2-strategy" class="sf-select">
+            <option value="single-pass">SINGLE PASS</option>
+            <option value="retry" selected>RETRY</option>
+            <option value="best-of-n">BEST OF N</option>
+            <option value="self-critique">SELF-CRITIQUE</option>
+            <option value="adversarial">ADVERSARIAL</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="stage-select">
+        <h2 class="section-title glow-yellow">SELECT STAGE</h2>
+        <select id="blueprint-select" class="sf-select wide">
+          <option value="">Loading stages...</option>
+        </select>
+        <label class="sf-checkbox-label">
+          <input type="checkbox" id="custom-task-check">
+          <span>CUSTOM MISSION</span>
+        </label>
+        <div id="custom-task-panel" class="custom-task-panel hidden">
+          <textarea id="custom-task" class="sf-textarea" rows="4" placeholder="Describe the coding task..."></textarea>
+          <input id="custom-test-cmd" class="sf-input" placeholder="Test command (e.g. npm test)">
+        </div>
+      </div>
+
+      <div class="config-bar">
+        <label class="config-label">ROUNDS <input type="number" id="max-rounds" value="5" min="1" max="20" class="sf-input-sm"></label>
+        <label class="config-label">TOKENS <input type="number" id="max-tokens" value="4096" min="1024" max="32768" step="1024" class="sf-input-sm"></label>
+      </div>
+
+      <button id="btn-fight" class="btn-fight" disabled>
+        <span class="btn-fight-text">F I G H T !</span>
+      </button>
+    </section>
+
+    <!-- ===== SCREEN 2: VS SPLASH ===== -->
+    <section id="screen-vs" class="screen">
+      <div class="vs-splash">
+        <div class="vs-splash-fighter vs-left">
+          <div class="vs-portrait" id="vs-p1-portrait"></div>
+          <div class="vs-fighter-name" id="vs-p1-name"></div>
+        </div>
+        <div class="vs-splash-text">
+          <div class="vs-big glow-yellow">VS</div>
+        </div>
+        <div class="vs-splash-fighter vs-right">
+          <div class="vs-portrait" id="vs-p2-portrait"></div>
+          <div class="vs-fighter-name" id="vs-p2-name"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SCREEN 3: FIGHT ===== -->
+    <section id="screen-fight" class="screen">
+      <div class="fight-hud">
+        <div class="hud-side hud-left">
+          <div class="hud-name" id="hud-p1-name">P1</div>
+          <div class="health-bar">
+            <div class="health-fill p1-health" id="hp-p1"></div>
+          </div>
+          <div class="hud-stats" id="hud-p1-stats">WAITING</div>
+        </div>
+        <div class="hud-center">
+          <div class="hud-round" id="hud-round">READY</div>
+          <div class="hud-timer" id="hud-timer">0:00</div>
+        </div>
+        <div class="hud-side hud-right">
+          <div class="hud-name" id="hud-p2-name">P2</div>
+          <div class="health-bar">
+            <div class="health-fill p2-health" id="hp-p2"></div>
+          </div>
+          <div class="hud-stats" id="hud-p2-stats">WAITING</div>
+        </div>
+      </div>
+
+      <div class="fight-stage">
+        <div class="fighter-sprite sprite-left" id="sprite-p1">
+          <div class="sprite-icon" id="sprite-p1-icon"></div>
+          <div class="sprite-label" id="sprite-p1-label"></div>
+        </div>
+        <div class="fight-action" id="fight-action"></div>
+        <div class="fighter-sprite sprite-right" id="sprite-p2">
+          <div class="sprite-icon" id="sprite-p2-icon"></div>
+          <div class="sprite-label" id="sprite-p2-label"></div>
+        </div>
+      </div>
+
+      <div class="combat-log" id="combat-log"></div>
+    </section>
+
+    <!-- ===== SCREEN 4: JUDGE ===== -->
+    <section id="screen-judge" class="screen">
+      <div class="judge-banner" id="judge-banner"></div>
+
+      <div class="judge-fighters">
+        <div class="judge-fighter" id="judge-p1">
+          <div class="judge-portrait" id="judge-p1-portrait"></div>
+          <div class="judge-name" id="judge-p1-name"></div>
+          <div class="judge-verdict" id="judge-p1-verdict"></div>
+        </div>
+        <div class="judge-vs-col">
+          <div class="judge-reason" id="judge-reason"></div>
+        </div>
+        <div class="judge-fighter" id="judge-p2">
+          <div class="judge-portrait" id="judge-p2-portrait"></div>
+          <div class="judge-name" id="judge-p2-name"></div>
+          <div class="judge-verdict" id="judge-p2-verdict"></div>
+        </div>
+      </div>
+
+      <div class="scorecard">
+        <table class="sf-table">
+          <thead>
+            <tr>
+              <th>STAT</th>
+              <th id="sc-p1-name">P1</th>
+              <th id="sc-p2-name">P2</th>
+            </tr>
+          </thead>
+          <tbody id="scorecard-body"></tbody>
+        </table>
+      </div>
+
+      <div class="judge-commentary" id="judge-commentary"></div>
+
+      <div class="judge-actions">
+        <button id="btn-rematch" class="btn-fight">
+          <span class="btn-fight-text">R E M A T C H</span>
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -19,7 +19,9 @@ export interface AgentLoopResult {
 export async function runAgentLoop(options: AgentLoopOptions): Promise<AgentLoopResult> {
   const { backend, systemPrompt, workspaceDir, maxTokens, maxTurns = 50 } = options;
 
-  const messages: Message[] = [];
+  const messages: Message[] = [
+    { role: 'user', content: 'Begin the task. Use the provided tools to implement the solution.' },
+  ];
   const tokensUsed = { input: 0, output: 0 };
   let doneSummary: string | undefined;
 

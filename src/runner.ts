@@ -8,8 +8,10 @@ import { singlePass } from './strategies/single-pass.js';
 import { retry } from './strategies/retry.js';
 import { selfCritique } from './strategies/self-critique.js';
 import { adversarial } from './strategies/adversarial.js';
+import { bestOfN } from './strategies/best-of-n.js';
 import { createWorkspace } from './workspace/setup.js';
 import { cleanupWorkspace } from './workspace/cleanup.js';
+import { getCodeSnapshot } from './workspace/snapshot.js';
 import { parseTestSummary } from './strategies/util.js';
 
 const STRATEGIES: Record<string, Strategy> = {
@@ -17,6 +19,7 @@ const STRATEGIES: Record<string, Strategy> = {
   retry,
   'self-critique': selfCritique,
   adversarial,
+  'best-of-n': bestOfN,
 };
 
 export function createBackend(spec: ModelSpec): LLMBackend {
@@ -30,7 +33,10 @@ export function createBackend(spec: ModelSpec): LLMBackend {
   }
 }
 
-export async function executeRun(config: RunConfig): Promise<RunResult> {
+export async function executeRun(
+  config: RunConfig,
+  onRound?: (round: RoundResult) => void,
+): Promise<RunResult> {
   const strategy = STRATEGIES[config.strategy];
   if (!strategy) throw new Error(`Unknown strategy: ${config.strategy}`);
 
@@ -44,6 +50,7 @@ export async function executeRun(config: RunConfig): Promise<RunResult> {
   const totalTokens = { input: 0, output: 0 };
   let testsPassed = false;
   let lastTestOutput = '';
+  let codeSnapshot = '';
 
   try {
     for await (const round of strategy.run({
@@ -53,6 +60,7 @@ export async function executeRun(config: RunConfig): Promise<RunResult> {
       workspaceDir,
     })) {
       rounds.push(round);
+      onRound?.(round);
       totalTokens.input += round.tokensUsed.input;
       totalTokens.output += round.tokensUsed.output;
 
@@ -62,6 +70,7 @@ export async function executeRun(config: RunConfig): Promise<RunResult> {
       }
     }
   } finally {
+    codeSnapshot = await getCodeSnapshot(workspaceDir).catch(() => '');
     await cleanupWorkspace(workspaceDir);
   }
 
@@ -76,5 +85,6 @@ export async function executeRun(config: RunConfig): Promise<RunResult> {
     testSummary: parseTestSummary(lastTestOutput),
     duration: Date.now() - startTime,
     timestamp: new Date().toISOString(),
+    codeSnapshot,
   };
 }

@@ -17,22 +17,14 @@
     ║                                                               ║
     ║          ⚔️  M O D E L   V S   M O D E L  ⚔️                 ║
     ║                                                               ║
-    ║     ┌─────────┐                         ┌─────────┐           ║
-    ║     │ CLAUDE  │  ░▒▓█ FIGHT! █▓▒░      │ OLLAMA  │           ║
-    ║     │  ╭━━╮   │                         │  ╭━━╮   │           ║
-    ║     │  ┃°°┃   │◄═══════════════════════►│  ┃^^┃   │           ║
-    ║     │  ╰┳┳╯   │    ROUND 1 ... N        │  ╰┳┳╯   │           ║
-    ║     │  ╱╰╰╲   │                         │  ╱╰╰╲   │           ║
-    ║     └─────────┘                         └─────────┘           ║
-    ║                                                               ║
-    ║        "Iterate until you win — or the tokens run out"        ║
-    ║                                                               ║
     ╚═══════════════════════════════════════════════════════════════╝
 ```
 
 **Can a cheap model match a frontier model by iterating more?**
 
-LLM Arena runs the same coding task against multiple models with different iteration strategies, then compares the results. Each model gets agentic tools (file I/O, shell) and works in an isolated workspace.
+LLM Arena pits AI models against each other on coding tasks — Street Fighter style. Each model gets agentic tools (file I/O, shell) and works in an isolated workspace. After both fighters finish, Opus judges the code quality and declares a winner.
+
+![LLM Arena Screenshot](arena-screenshot.png)
 
 ## Setup
 
@@ -42,17 +34,26 @@ npm run build
 export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-## Usage
+## Web UI
+
+```bash
+# Start the arena web server
+PORT=8888 node --env-file=.env dist/web.js
+```
+
+Then visit `/arena` (if behind nginx) or `http://localhost:8888` directly.
+
+## CLI Usage
 
 ```bash
 # Sonnet single-pass vs Haiku with retries
 arena run -b blueprints/hello-api.md \
-  -m anthropic:claude-sonnet-4-6-20250514@single-pass \
+  -m anthropic:claude-sonnet-4-6@single-pass \
   -m anthropic:claude-haiku-4-5-20251001@retry
 
 # All models x all strategies (cartesian)
 arena run -b blueprints/hello-api.md \
-  -m anthropic:claude-sonnet-4-6-20250514 \
+  -m anthropic:claude-sonnet-4-6 \
   -m anthropic:claude-haiku-4-5-20251001 \
   -s single-pass,retry,self-critique \
   --max-rounds 5
@@ -76,7 +77,7 @@ backend:model[@strategy]
 ```
 
 - `anthropic:claude-haiku-4-5-20251001` — uses global `-s` strategies
-- `anthropic:claude-sonnet-4-6-20250514@single-pass` — override: only single-pass for this model
+- `anthropic:claude-sonnet-4-6@single-pass` — override: only single-pass for this model
 - `ollama:qwen3-coder@retry` — local model with retry strategy
 
 ## Strategies
@@ -84,9 +85,20 @@ backend:model[@strategy]
 | Strategy | Description |
 |---|---|
 | `single-pass` | One agentic conversation. Baseline — no feedback loop. |
-| `retry` | Run tests after each round. Feed failures back. Repeat until pass or max rounds. |
+| `retry` | REPL loop: run tests, feed failures back, repeat until pass or max rounds. |
+| `best-of-n` | Run N independent attempts in parallel, pick the best result. N = rounds setting. |
 | `self-critique` | Implement, then same model critiques in a fresh conversation. Fix and repeat. |
 | `adversarial` | Like self-critique, but a different model critiques. Set with `--critic`. |
+
+## Judging
+
+After both fighters complete, **Opus** reviews the actual code produced by each fighter and scores them 0-10 on:
+
+- **Correctness** — did tests pass? does the code work?
+- **Code quality** — clean, readable, well-structured?
+- **Efficiency** — reasonable approach, not over-engineered?
+
+The judge picks a winner and delivers a Street Fighter announcer-style verdict.
 
 ## Scorecard
 

@@ -22,7 +22,7 @@ export interface ModelSpec {
   model: string;
 }
 
-export type StrategyName = 'single-pass' | 'retry' | 'self-critique' | 'adversarial';
+export type StrategyName = 'single-pass' | 'retry' | 'self-critique' | 'adversarial' | 'best-of-n';
 
 export interface RoundResult {
   round: number;
@@ -44,6 +44,7 @@ export interface RunResult {
   testSummary: string;
   duration: number;
   timestamp: string;
+  codeSnapshot?: string;
 }
 
 export interface Message {
