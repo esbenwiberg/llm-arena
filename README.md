@@ -11,7 +11,7 @@ LLM Arena pits AI models against each other on coding tasks — Street Fighter s
 ```bash
 npm install --include=dev
 npm run build
-export ANTHROPIC_API_KEY=sk-ant-...
+export LLM_ARENA_ANTHROPIC_KEY=sk-ant-...   # or ANTHROPIC_API_KEY
 ```
 
 ## Web UI
@@ -138,5 +138,5 @@ All file operations are sandboxed to the run's temporary workspace.
 
 ## Backends
 
-- **Anthropic** — requires `ANTHROPIC_API_KEY` env var
+- **Anthropic** — requires `LLM_ARENA_ANTHROPIC_KEY` (preferred) or `ANTHROPIC_API_KEY` env var
 - **Ollama** — requires Ollama running locally (default `http://localhost:11434`, override with `OLLAMA_HOST`)

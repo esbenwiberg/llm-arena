@@ -133,7 +133,7 @@ program
   .action(() => {
     console.log(LOGO);
     console.log(chalk.bold('Available backends:\n'));
-    console.log('  anthropic:<model>  — Anthropic API (requires ANTHROPIC_API_KEY)');
+    console.log('  anthropic:<model>  — Anthropic API (requires LLM_ARENA_ANTHROPIC_KEY or ANTHROPIC_API_KEY)');
     console.log('    Examples:');
     console.log('      anthropic:claude-haiku-4-5-20251001');
     console.log('      anthropic:claude-sonnet-4-6-20250514');

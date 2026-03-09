@@ -7,7 +7,13 @@ export class AnthropicBackend implements LLMBackend {
   private model: string;
 
   constructor(model: string) {
-    this.client = new Anthropic();
+    const apiKey = process.env.LLM_ARENA_ANTHROPIC_KEY ?? process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        'No Anthropic API key found. Set LLM_ARENA_ANTHROPIC_KEY (preferred) or ANTHROPIC_API_KEY.',
+      );
+    }
+    this.client = new Anthropic({ apiKey });
     this.model = model;
   }
 

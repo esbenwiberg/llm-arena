@@ -20,7 +20,7 @@ export async function runAgentLoop(options: AgentLoopOptions): Promise<AgentLoop
   const { backend, systemPrompt, workspaceDir, maxTokens, maxTurns = 50 } = options;
 
   const messages: Message[] = [
-    { role: 'user', content: 'Begin the task. Use the provided tools to implement the solution.' },
+    { role: 'user', content: [{ type: 'text', text: 'Begin the task. Use the provided tools to implement the solution.' }] },
   ];
   const tokensUsed = { input: 0, output: 0 };
   let doneSummary: string | undefined;
